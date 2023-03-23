@@ -191,70 +191,83 @@ namespace prog_cvic
         // Saves data from scheduleFromUIS Dictionary to .csv or .xml files
         static private void SaveSchedule(string folderPath, string folderName, string fileName, string typeOfFile = ".csv")
         {
-            folderPath = System.IO.Path.Combine(folderPath, folderName);
-            if (typeOfFile == ".csv" || typeOfFile == ".xml") // cheak if you use proper type of file
+            Console.Clear();
+            if (!Directory.Exists(folderPath))// cheaks if you use proper path
             {
-                //Makes path to file by combining fileName, typeOfFile and folderPath 
-                fileName = fileName + typeOfFile; 
-                var filePath = System.IO.Path.Combine(folderPath, fileName);
-                //Creates folder and file
-                if (!System.IO.Directory.Exists(folderPath))
+                Console.WriteLine("Nespravni napsana cesta");
+                Console.ReadKey();
+                return;
+            }
+            if (typeOfFile != ".csv" || typeOfFile != ".xml") // cheaks if you use proper type of file
+            {
+                Console.WriteLine("Nespravni typ souboru");
+                Console.ReadKey();
+                return;
+            }
+                folderPath = System.IO.Path.Combine(folderPath, folderName);
+            
+            //Makes path to file by combining fileName, typeOfFile and folderPath 
+            fileName = fileName + typeOfFile;
+            var filePath = System.IO.Path.Combine(folderPath, fileName);
+            //Creates folder and file
+            if (!System.IO.Directory.Exists(folderPath))
+            {
+                System.IO.Directory.CreateDirectory(folderPath);
+                System.IO.File.Create(filePath).Close();
+            }
+            else
+            {
+                if (!System.IO.File.Exists(filePath))
                 {
-                    System.IO.Directory.CreateDirectory(folderPath);
                     System.IO.File.Create(filePath).Close();
                 }
                 else
                 {
-                    if (!System.IO.File.Exists(filePath))
-                    {
-                        System.IO.File.Create(filePath).Close();
-                    }
-                    else
-                    {
-                        File.Delete(filePath);
-                        System.IO.File.Create(filePath).Close();
-                    }
-                }
-
-                if (typeOfFile == ".csv")//Cheaks what type of file you using
-                {
-                    for (int i = 0; i < 9; i++)
-                    {
-                        foreach(var key in scheduleFromUIS.Keys)
-                        {
-                            //Replaces all ';' to ':' from Dictionary
-                            scheduleFromUIS[key][i] = scheduleFromUIS[key][i].Replace(";", ",");
-                        }
-                    }
-                    //Creates StringBuilder and then appends keys to it 
-                    StringBuilder output = new StringBuilder();
-                    output.AppendLine(string.Join(";", scheduleFromUIS.Keys));
-                    //Appends rows to StringBuilder strings with values in them
-                    List<string> row = new List<string>();
-                    for (int i = 0; i < 9; i++)
-                    {
-                        foreach (var key in scheduleFromUIS.Keys)
-                        {
-                            row.Add(scheduleFromUIS[key][i]);
-                        }
-                        output.AppendLine(string.Join(";", row));
-                        row.Clear();
-                    }
-                    System.IO.File.AppendAllText(filePath, output.ToString());//Appends all lines to the file
-                }
-                else if (typeOfFile == ".xml")
-                {
-                    
-                    XDocument doc = 
-                        new XDocument( //Creats Xml document
-                        new XElement("root", from kvp in scheduleFromUIS select //Creats root Xml element
-                        new XElement(kvp.Key, from value in kvp.Value select //Creates an Xml key element and fills it with keys
-                        new XElement("item", value)))); //Creats an Xml value element and fills it with values
-                    doc.Save(filePath);
+                    File.Delete(filePath);
+                    System.IO.File.Create(filePath).Close();
                 }
             }
-            else { Console.WriteLine("nespravni typ souboru"); }
-            
+
+            if (typeOfFile == ".csv")//Cheaks what type of file you using
+            {
+                for (int i = 0; i < 9; i++)
+                {
+                    foreach(var key in scheduleFromUIS.Keys)
+                    {
+                        //Replaces all ';' to ':' from Dictionary
+                        scheduleFromUIS[key][i] = scheduleFromUIS[key][i].Replace(";", ",");
+                    }
+                }
+                //Creates StringBuilder and then appends keys to it 
+                StringBuilder output = new StringBuilder();
+                output.AppendLine(string.Join(";", scheduleFromUIS.Keys));
+                //Appends rows to StringBuilder strings with values in them
+                List<string> row = new List<string>();
+                for (int i = 0; i < 9; i++)
+                {
+                    foreach (var key in scheduleFromUIS.Keys)
+                    {
+                        row.Add(scheduleFromUIS[key][i]);
+                    }
+                    output.AppendLine(string.Join(";", row));
+                    row.Clear();
+                }
+                System.IO.File.AppendAllText(filePath, output.ToString());//Appends all lines to the file
+            }
+            else if (typeOfFile == ".xml")
+            {
+                    
+                XDocument doc = 
+                    new XDocument( //Creats Xml document
+                    new XElement("root", from kvp in scheduleFromUIS select //Creats root Xml element
+                    new XElement(kvp.Key, from value in kvp.Value select //Creates an Xml key element and fills it with keys
+                    new XElement("item", value)))); //Creats an Xml value element and fills it with values
+                doc.Save(filePath);
+            }
+
+            Console.WriteLine("informace ulozena");
+            Console.ReadKey(true);
+
         }
         #endregion
 
@@ -429,9 +442,6 @@ namespace prog_cvic
                             if (fileName != "" && folderName != "" && folderPath != "")
                             {
                                 SaveSchedule(folderPath, folderName, fileName, typeOfFile);
-                                Console.Clear();
-                                Console.WriteLine("informace ulozena");
-                                Console.ReadKey(true);
                                 quit = true;
                             }
                             else
