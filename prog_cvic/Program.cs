@@ -352,7 +352,33 @@ namespace prog_cvic
                 {
                     case ConsoleKey.Enter:
                         if (lineCounter== 1) { name = Console.ReadLine(); }
-                        else if (lineCounter== 2) { password = Console.ReadLine(); }
+                        else if (lineCounter== 2) 
+                        {
+                            StringBuilder starLine = new StringBuilder();
+                            while (true)
+                            {
+                                var hidenKey = Console.ReadKey(true);
+                                if (hidenKey.Key == ConsoleKey.Enter)
+                                {
+                                    Console.WriteLine();
+                                    break;
+                                }
+                                else if (hidenKey.Key == ConsoleKey.Backspace && password.Length > 0)
+                                {
+                                    password = password.Substring(0, password.Length - 1);
+                                    starLine.Remove(starLine.Length - 1, 1);
+                                    Console.SetCursorPosition(Console.CursorLeft - 1, Console.CursorTop);
+                                    Console.Write(" ");
+                                    Console.SetCursorPosition(Console.CursorLeft - 1, Console.CursorTop);
+                                }
+                                else
+                                {
+                                    password += hidenKey.KeyChar;
+                                    starLine.Append("*");
+                                    Console.Write("*");
+                                }
+                            }
+                        }
                         else if (lineCounter== 3 && name.Length != 0 && password.Length != 0)
                         {
                             GetScheduleFromUIS(name, password);
